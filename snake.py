@@ -1,22 +1,22 @@
 import pygame
 import random
-import asyncio
+import asyncio 
 pygame.init()
 clock=pygame.time.Clock()
 framerate=10
-running=True
+running=True 
 screen=pygame.display.set_mode((500,400))
 grid={}
-apples=["0,0","3,2","5,3","2,4","3,4"]
+apples=["0,0","3,2","5,3","2,4","3,4"] 
 snake={"2,3":1,"2,4":1,"2,5":1}
-player_square=pygame.Rect(50,50,50,50) 
+player_square=pygame.Rect(50,50,50,50)    
 
 #         ----------functions 
 
 def reset_snake ():
 	# sets the defalt vaules of the eviroment and snake 
-	pygame.time.wait(300)
-	global grid
+	pygame.time.wait(300)  
+	global grid 
 	global apples
 	global snake       
 	grid={} #empty to be set later 
