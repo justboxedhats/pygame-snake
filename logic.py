@@ -1,17 +1,34 @@
 import pygame 
 pygame.init()
-framerate=10
+pygame.font.init()
 
-# functions  
- 
-def buttions (x,y,rect,color):
-    pass
+"""
+Containts many functions 
+"""
+
+# functions
+
+def button(screen,x, y, width, height, text, color=(0, 0, 0), text_color=(255, 255, 255),font="df"):
+    n_font=fonts_li(font)
+    pygame.draw.rect(screen, color, (x, y, width, height))
+    text_surface = n_font.render(text, True, text_color)
+    text_rect = text_surface.get_rect(center=(x + width / 2, y + height / 2))
+    button_rect = pygame.Rect(x,y,width,height)
+    screen.blit(text_surface, text_rect)
+    if button_rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_just_pressed()[0]:
+        #if "clicked" not in flags: 
+        #    flags.append("clicked")   
+        return True
+    else: return False   
+
+
 # checks if using an image 
 # creates the rect
 # checks for collision 
 # renders acordenly 
 
-def font_list (): 
+ 
+def fonts_li (str="df"):
         #print("loading font fuction") 
     if str == "df":
         return pygame.font.SysFont("Arial", 20)
@@ -28,11 +45,12 @@ def font_list ():
     else:
         print(f" {str} not in libary ")
 
-
-def draw_text (x,y,text="",type="def", size=5):
-    n_font=fonts_li(font)
-    text_surface = n_font.render(text, True, color)
-    screen.blit(text_surface, (x, y))
+def draw_text(screen,text, x, y, color=(0, 0, 0),font="df"):
+    n_font=fonts_li(font) 
+    print(f" text: { text }")
+    text_surface = n_font.render(text, True, color)  # error here
+    screen.blit(text_surface, (x,y)) 
+    
 
 #array of if conditions for font
 # makes the text object
@@ -44,7 +62,7 @@ def animation (x,y,type, strength,offset ):
     global time
     if type=="noise": 
         print="noise"
-        # return
+        # return 
     elif type== "sine_sway" :
         print="sine_sway"
 
@@ -64,7 +82,7 @@ def animation (x,y,type, strength,offset ):
 def per2pix (percent,whole="h_l"):
     m_whole=whole
 
-    if whole == "s_w": 
+    if whole == "s_w":   
         m_whole=screen.get_width()
     elif whole == "s_h":
         m_whole = screen.get_height()
