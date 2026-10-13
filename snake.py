@@ -6,7 +6,7 @@ import logic
 pygame.init()
 clock=pygame.time.Clock()
 pygame.font.init()
-framerate=10
+framerate=7
 running=True 
 screen=pygame.display.set_mode((500,400))
 grid={} 
@@ -18,11 +18,11 @@ player_square=pygame.Rect(50,50,50,50)
 # ---importing images 
 
 ##snake_tital= pygame.image.load("").convert_alpha()
-#cheacker_bg=  pygame.image.load("green_grid-1.png.png").convert_alpha()
-#snake_head= pygame.image.load("player.png").convert_alpha()
+cheacker_bg=  pygame.image.load("pygame-snake\green_grid -1.png.png").convert_alpha()
+#snake_head= pygame.image.load("").convert_alpha()
 #snake_body= pygame.image.load("").convert_alpha()
 #snake_tail= pygame.image.load("").convert_alpha()
-#apple=pygame.image.load("apple-1.png.png").convert_alpha()
+apple=pygame.image.load("pygame-snake/apple-1.png.png").convert_alpha()
 
 #screen.blit(player_sprite, (100, 150)) 
 
@@ -35,6 +35,7 @@ def reset_snake ():
 	global apples
 	global snake       
 	grid={} #empty to be set later 
+	#apples=[]
 	apples=["0,0","3,2","5,3","2,4","3,4"] 
 	snake={"2,3":1,"2,4":1,"2,5":1}
 	#  pair of numbers are coordiates, the number represents the direction of 
@@ -111,17 +112,20 @@ def button(x, y, width, height, text, color=(0, 0, 0), text_color=(255, 255, 255
         #if "clicked" not in flags: 
         #    flags.append("clicked")   
         return True
-    else: return False   
+    else: return False
 
-def per2pix (percent,whole="h_l"):
-    m_whole=whole
-
-    if whole == "s_w":   
-        m_whole=screen.get_width()
-    elif whole == "s_h":
-        m_whole = screen.get_height()
-    
-    return int( (percent / 100) * m_whole)
+def per2pix (percent,whole="s_w"):
+	m_whole=whole
+	
+	if whole == "s_w":
+		m_whole=screen.get_width()
+	elif whole == "s_h":
+		m_whole = screen.get_height()
+	else: 
+		print(f" {whole} is an invalid input ")
+		
+	print (f" per: {percent} m_whole ")
+	return int( (percent / 100) * m_whole)
 
 reset_grid(grid)# makes the grid 
 
@@ -134,9 +138,12 @@ while running:
 		if event.type==pygame.QUIT:
 			running=False 
   
-	if "home_screen" in flags: 
+	if "home_screen" in flags:  
 		bg_color="salmond"
-		if button(per2pix(50),per2pix(70,"v_l"),per2pix(4),per2pix(2,"v_l"),"Play!", (240,180,250),(180,250,230)) :
+		chearker_bg_rect=cheacker_bg.get_rect()
+		screen.blit(cheacker_bg,chearker_bg_rect,screen.get_rect())
+		draw_text("snake.py",per2pix(20),per2pix(20,"s_h"),(128,230,185),"t1")
+		if button(per2pix(30),per2pix(65,"s_h"),per2pix(30),per2pix(10,"s_h"),"Play!", (20,180,200),(180,250,230)) :
 			print("button pressed ")
 			flags=[]
 			flags.append("snake")
@@ -158,7 +165,7 @@ while running:
 			if keys[pygame.K_UP]and not snake[list(snake.keys())[0]]==3 :
 				snake[list(snake.keys())[0]]=1
 				print("up")
-			if keys[pygame.K_LEFT]and not snake[list(snake.keys())[0]]==2:
+			if keys[pygame.K_LEFT]and not snake[list(snake.keys())[0]]==2: 
 				print("left") 
 				snake[list(snake.keys())[0]]=4	
 			if keys[pygame.K_RIGHT] and not snake[list(snake.keys())[0]]==4:
@@ -190,66 +197,87 @@ while running:
 
 			x_y=pos_get(list(snake.keys())[0]) 
 			#print(list(snake.keys())[0])   
-				
-		#    ---- uses python frount segmnet to move or extend snake 
-		if snake[f"{x_y[0]},{x_y[1]}"]==1: 
-			#  checks if the snake colides with apple and walls  
-			if f"{x_y[0]},{x_y[1]-1}" in list(grid.keys()) and not f"{x_y[0]},{x_y[1]-1}" in list(snake.keys()):
-				# the goal is to get the new portion of the snake added and to remove the last portion of the snake
-				L={f"{x_y[0]},{x_y[1]-1}":1}
-				snake= L | snake
-				if not list(snake.keys())[0] in apples:
-					del snake[list(snake.keys())[-1]]  
-				else:
-					apples.remove(list(snake.keys())[0]) 
-					add_apple(snake,apples)
-			else:
-				reset_snake() 
+		else: 
+			keys=pygame.key.get_pressed() # 	arrow key input 
+			if keys[pygame.K_DOWN]and not snake[list(snake.keys())[0]]==1:
+				flags.append("begin")
+				x_y=pos_get(list(snake.keys())[0]) 
+			if keys[pygame.K_UP]and not snake[list(snake.keys())[0]]==3 :
+				flags.append("begin")
+				x_y=pos_get(list(snake.keys())[0]) 
+			if keys[pygame.K_LEFT]and not snake[list(snake.keys())[0]]==2: 
+				flags.append("begin")
+				x_y=pos_get(list(snake.keys())[0]) 
+			if keys[pygame.K_RIGHT] and not snake[list(snake.keys())[0]]==4:
+				flags.append("begin")
+				x_y=pos_get(list(snake.keys())[0]) 
 
-		# repeated from the last 
-		elif snake[f"{x_y[0]},{x_y[1]}"]==2:   
-			if f"{x_y[0]+1},{x_y[1]}" in list(grid.keys()) and not f"{x_y[0]+1},{x_y[1]}" in list(snake.keys()):
-				L={f"{x_y[0]+1},{x_y[1]}":2}
-				snake=L | snake
-				if not list(snake.keys())[0] in apples:
-					del snake[list(snake.keys())[-1]]
-				else:
-					apples.remove(list(snake.keys())[0])
-					add_apple(snake,apples)
-			else:
-				reset_snake()
+			draw_text("press a arrow key to start",per2pix(0),per2pix(10,"s_h"),(204,29,123),"t2")
+			
 
-		elif snake[f"{x_y[0]},{x_y[1]}"]==3:
-			if f"{x_y[0]},{x_y[1]+1}" in list(grid.keys()) and not f"{x_y[0]},{x_y[1]+1}" in list(snake.keys()):
-				L={f"{x_y[0]},{x_y[1]+1}":3}
-				snake=L | snake
-				if not list(snake.keys())[0] in apples:
-					del snake[list(snake.keys())[-1]]
+			# add arrow check 
+		if "begin" in flags:  
+			#    ---- uses python frount segmnet to move or extend snake 
+			if snake[f"{x_y[0]},{x_y[1]}"]==1: 
+				#  checks if the snake colides with apple and walls  
+				if f"{x_y[0]},{x_y[1]-1}" in list(grid.keys()) and not f"{x_y[0]},{x_y[1]-1}" in list(snake.keys()):
+					# the goal is to get the new portion of the snake added and to remove the last portion of the snake
+					L={f"{x_y[0]},{x_y[1]-1}":1}
+					snake= L | snake
+					if not list(snake.keys())[0] in apples:
+						del snake[list(snake.keys())[-1]]  
+					else:
+						apples.remove(list(snake.keys())[0]) 
+						add_apple(snake,apples)
 				else:
-					apples.remove(list(snake.keys())[0])
-					add_apple(snake,apples)
-			else:
-				reset_snake() 
+					reset_snake() 
 
-		#repeated for the last type of segment 
-		elif snake[f"{x_y[0]},{x_y[1]}"]==4:
-			if f"{x_y[0]-1},{x_y[1]}" in list(grid.keys()) and not f"{x_y[0]-1},{x_y[1]}" in list(snake.keys()):
-				L={f"{x_y[0]-1},{x_y[1]}":4}
-				snake=L | snake
-				if not list(snake.keys())[0] in apples: 
-					del snake[list(snake.keys())[-1]]
+			# repeated from the last 
+			elif snake[f"{x_y[0]},{x_y[1]}"]==2:   
+				if f"{x_y[0]+1},{x_y[1]}" in list(grid.keys()) and not f"{x_y[0]+1},{x_y[1]}" in list(snake.keys()):
+					L={f"{x_y[0]+1},{x_y[1]}":2}
+					snake=L | snake
+					if not list(snake.keys())[0] in apples:
+						del snake[list(snake.keys())[-1]]
+					else:
+						apples.remove(list(snake.keys())[0])
+						add_apple(snake,apples)
 				else:
-					apples.remove(list(snake.keys())[0])
-					add_apple(snake,apples)
-			else:
-				reset_snake() 
+					reset_snake()
 
-		# renders the apples   
-		for x in apples:
-			x_y=pos_get(x)
-			player_square.x=x_y[0]*50
-			player_square.y=x_y[1]*50
-			pygame.draw.rect(screen,(240,110,170),player_square)
+			elif snake[f"{x_y[0]},{x_y[1]}"]==3:
+				if f"{x_y[0]},{x_y[1]+1}" in list(grid.keys()) and not f"{x_y[0]},{x_y[1]+1}" in list(snake.keys()):
+					L={f"{x_y[0]},{x_y[1]+1}":3}
+					snake=L | snake
+					if not list(snake.keys())[0] in apples:
+						del snake[list(snake.keys())[-1]]
+					else:
+						apples.remove(list(snake.keys())[0])
+						add_apple(snake,apples)
+				else:
+					reset_snake() 
+
+			#repeated for the last type of segment 
+			elif snake[f"{x_y[0]},{x_y[1]}"]==4:
+				if f"{x_y[0]-1},{x_y[1]}" in list(grid.keys()) and not f"{x_y[0]-1},{x_y[1]}" in list(snake.keys()):
+					L={f"{x_y[0]-1},{x_y[1]}":4}
+					snake=L | snake
+					if not list(snake.keys())[0] in apples: 
+						del snake[list(snake.keys())[-1]]
+					else:
+						apples.remove(list(snake.keys())[0])
+						add_apple(snake,apples)
+				else:
+					reset_snake() 
+
+			# renders the apples   
+			for x in apples:
+				x_y=pos_get(x)
+				player_square.x=x_y[0]*50
+				player_square.y=x_y[1]*50
+				sc_apple = pygame.transform.scale(apple, (50,50))
+				screen.blit(sc_apple,player_square)
+				#pygame.draw.rect(screen,(240,110,170),player_square)
 
 	pygame.display.flip()  
 
