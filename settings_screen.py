@@ -1,4 +1,4 @@
-import pygame
+import pygame 
 import math
 pygame.init()
 running=True 
