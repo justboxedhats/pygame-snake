@@ -2,12 +2,12 @@ import pygame
 import math
 pygame.init()
 running=True 
-time=pygame.time.Clock()
+time=pygame.time.Clock() 
 screen=pygame.screen.setmode(500,400)
 # makes window scalable
 
 #setting varables 
-def_text=pygame.font.
+def_text=pygame.font 
 settings={"s_color":(120,240,120),"sn_cost":"def","gm_speed":1,"ap_fre":0.5, "gm_size":5,"gm_color":(200,250,200),"gm_angle":90,"gm_zoom":1,"gm_mode","gm_x":0,"gm_y":0}
           
 
