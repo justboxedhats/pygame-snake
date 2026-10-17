@@ -8,30 +8,36 @@ clock=pygame.time.Clock()
 pygame.font.init()
 framerate=7
 running=True 
-screen=pygame.display.set_mode((500,400))
+screen=pygame.display.set_mode((500,400), pygame.RESIZABLE)
 grid={} 
+game_size= 8
+game_color="df"
+snake_color="df"
 flags=["home_screen"]
 apples=["0,0","3,2","5,3","2,4","3,4"]  
+max_apples=5 
 snake={"2,3":1,"2,4":1,"2,5":1}
 player_square=pygame.Rect(50,50,50,50)
 
 # ---importing images 
 
-##snake_tital= pygame.image.load("").convert_alpha()
-cheacker_bg=  pygame.image.load("pygame-snake\green_grid -1.png.png").convert_alpha()
-#snake_head= pygame.image.load("").convert_alpha()
-#snake_body= pygame.image.load("").convert_alpha()
-#snake_tail= pygame.image.load("").convert_alpha()
-apple=pygame.image.load("pygame-snake/apple-1.png.png").convert_alpha()
-
+try: 
+	##snake_tital= pygame.image.load("").convert_alpha()
+	cheacker_bg=  pygame.image.load("pygame-snake\green_grid -1.png.png").convert_alpha()
+	#snake_head= pygame.image.load("").convert_alpha()
+	#snake_body= pygame.image.load("").convert_alpha()
+	#snake_tail= pygame.image.load("").convert_alpha()
+	apple=pygame.image.load("pygame-snake/apple-1.png.png").convert_alpha()
+except:
+	pass
 #screen.blit(player_sprite, (100, 150)) 
 
 #         ----------functions 
 
 def reset_snake ():
 	# sets the defalt vaules of the eviroment and snake 
-	pygame.time.wait(300)  
-	global grid 
+	pygame.time.wait(300)
+	global grid  
 	global apples
 	global snake       
 	grid={} #empty to be set later 
@@ -120,7 +126,7 @@ def per2pix (percent,whole="s_w"):
 	if whole == "s_w":
 		m_whole=screen.get_width()
 	elif whole == "s_h":
-		m_whole = screen.get_height()
+		m_whole = screen.get_height()   
 	else: 
 		print(f" {whole} is an invalid input ")
 		
@@ -132,27 +138,82 @@ reset_grid(grid)# makes the grid
 #       --------- game loop 
 
 while running:
-
+  
 	screen.fill("teal")
 	for event in pygame.event.get(): # -------        event loop
-		if event.type==pygame.QUIT:
-			running=False 
-  
-	if "home_screen" in flags:  
-		bg_color="salmond"
-		chearker_bg_rect=cheacker_bg.get_rect()
-		screen.blit(cheacker_bg,chearker_bg_rect,screen.get_rect())
+		if event.type==pygame.QUIT: 
+			running=False   
+   
+	if "home_screen" in flags:    
+		bg_color="lime green"
+		try:
+			sc_chearker = pygame.transform.scale(cheacker_bg, (50,50))
+			chearker_bg_rect=cheacker_bg.get_rect()  
+			screen.blit(sc_chearker,chearker_bg_rect,screen.get_rect())
+		except:
+			pass
 		draw_text("snake.py",per2pix(20),per2pix(20,"s_h"),(128,230,185),"t1")
 		if button(per2pix(30),per2pix(65,"s_h"),per2pix(30),per2pix(10,"s_h"),"Play!", (20,180,200),(180,250,230)) :
 			print("button pressed ")
-			flags=[]
+			flags=[] 
 			flags.append("snake")
-
 		
-
 
 	elif "settings" in flags:  
 		bg_color="red"
+
+		if button(per2pix(1),per2pix(1,"s_h"),per2pix(3),per2pix(3,"s_h"),"<", (250,100,160),(100,100,100)):
+			flags=[]
+			flags.append("home_screen")
+
+		# max apples
+		draw_text(f"max apples : {max_apples}",per2pix(35) ,per2pix(15,"s_h"))
+		if button(per2pix(30),per2pix(15,"s_h"),per2pix(5),per2pix(5,"s_h"), "<", (200,150,200 ),(255,180,180 ) ):
+			max_apples-=1
+		if button(per2pix(75),per2pix(15,"s_h"),per2pix(5),per2pix(5,"s_h"),">",(200,150,200),(255,180,180)):
+			max_apples+=1 
+
+		
+		#modes:
+		#- fliping snake - dashed snake  -   	
+
+		#snake color
+		#- needs shading 
+
+		# game size
+		draw_text(f"Game Size : {game_size}",per2pix(35),per2pix(30))
+		if button(per2pix(30),per2pix(30,"s_h"),per2pix(5),per2pix(5,"s_h"), "<", (200,150,200 ),(255,180,180 ) ):
+			game_size-=1
+		if button(per2pix(70),per2pix(30,"s_h"),per2pix(5),per2pix(5,"s_h"), ">", (200,150,200 ),(255,180,180 ) ):
+			game_size+=1
+		
+		# ammount of apples  
+
+	elif "game_over" in flags: 
+		bg_color="orange" 
+
+		draw_text("Game Over", per2pix(15), per2pix(10,"s_h"),(130,233,199),"t2")
+
+		if button(per2pix(30),per2pix(40,"s_h"),per2pix(25),per2pix(10,"s_h"),"replay?",(34,234,122),(122,34,200)):
+			print("retry")
+			flags=[] 
+			flags.append("snake") 
+			reset_snake()
+     
+		if button(per2pix(30),per2pix(20,"s_h"),per2pix(25),per2pix(10,"s_h"),"settings",(205,123,145),(100,244,253)):
+			print("settings") 
+			flags=[]
+			flags.append("settings")
+
+
+
+		if button(per2pix(30),per2pix(80,"s_h"), per2pix(25), per2pix(10, "s_h"), "Quit", (21,123,104),(229,200,135)):
+			print("quit")
+			flags=[]
+			running =False
+
+
+
 
 	elif "snake" in flags :
 		bg_color="teal"
@@ -199,7 +260,7 @@ while running:
 			#print(list(snake.keys())[0])   
 		else: 
 			keys=pygame.key.get_pressed() # 	arrow key input 
-			if keys[pygame.K_DOWN]and not snake[list(snake.keys())[0]]==1:
+			if keys[pygame.K_DOWN]and not snake[list(snake.keys())[0]]==1: 
 				flags.append("begin")
 				x_y=pos_get(list(snake.keys())[0]) 
 			if keys[pygame.K_UP]and not snake[list(snake.keys())[0]]==3 :
@@ -223,27 +284,27 @@ while running:
 				if f"{x_y[0]},{x_y[1]-1}" in list(grid.keys()) and not f"{x_y[0]},{x_y[1]-1}" in list(snake.keys()):
 					# the goal is to get the new portion of the snake added and to remove the last portion of the snake
 					L={f"{x_y[0]},{x_y[1]-1}":1}
-					snake= L | snake
+					snake= L | snake  
 					if not list(snake.keys())[0] in apples:
 						del snake[list(snake.keys())[-1]]  
 					else:
 						apples.remove(list(snake.keys())[0]) 
 						add_apple(snake,apples)
 				else:
-					reset_snake() 
+					flags.append("game_over")
 
 			# repeated from the last 
 			elif snake[f"{x_y[0]},{x_y[1]}"]==2:   
 				if f"{x_y[0]+1},{x_y[1]}" in list(grid.keys()) and not f"{x_y[0]+1},{x_y[1]}" in list(snake.keys()):
 					L={f"{x_y[0]+1},{x_y[1]}":2}
 					snake=L | snake
-					if not list(snake.keys())[0] in apples:
+					if not list(snake.keys())[0] in apples:  
 						del snake[list(snake.keys())[-1]]
 					else:
 						apples.remove(list(snake.keys())[0])
 						add_apple(snake,apples)
 				else:
-					reset_snake()
+					flags.append("game_over") 
 
 			elif snake[f"{x_y[0]},{x_y[1]}"]==3:
 				if f"{x_y[0]},{x_y[1]+1}" in list(grid.keys()) and not f"{x_y[0]},{x_y[1]+1}" in list(snake.keys()):
@@ -255,7 +316,7 @@ while running:
 						apples.remove(list(snake.keys())[0])
 						add_apple(snake,apples)
 				else:
-					reset_snake() 
+					flags.append("game_over") 
 
 			#repeated for the last type of segment 
 			elif snake[f"{x_y[0]},{x_y[1]}"]==4:
@@ -268,18 +329,20 @@ while running:
 						apples.remove(list(snake.keys())[0])
 						add_apple(snake,apples)
 				else:
-					reset_snake() 
+					flags.append("game_over") 
 
 			# renders the apples   
 			for x in apples:
 				x_y=pos_get(x)
 				player_square.x=x_y[0]*50
-				player_square.y=x_y[1]*50
-				sc_apple = pygame.transform.scale(apple, (50,50))
-				screen.blit(sc_apple,player_square)
-				#pygame.draw.rect(screen,(240,110,170),player_square)
+				player_square.y=x_y[1]*50 
+				try: 
+					sc_apple = pygame.transform.scale(apple, (50,50))
+					screen.blit(sc_apple,player_square)
+				except:
+					pygame.draw.rect(screen,(240,110,170),player_square)
 
-	pygame.display.flip()  
+	pygame.display.flip() 
 
 	reset_grid(grid)
 	clock.tick(framerate)
