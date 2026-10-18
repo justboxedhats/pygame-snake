@@ -1,16 +1,20 @@
 import pygame
 import random
+import time 
 import asyncio 
-#import homescreen
 import logic  
 pygame.init()
 clock=pygame.time.Clock()
-pygame.font.init()
-framerate=7
+pygame.font.init() 
+c_time=time.ctime()
+m_time=time.perf_counter()
+framerate=60
 running=True 
 screen=pygame.display.set_mode((500,400), pygame.RESIZABLE)
+bg_color="teal"
 grid={} 
 score=0
+speed=0.1 
 game_mode="df" 
 gam_modes=["df","df(again)","still df","always df"]
 game_size= 8
@@ -41,11 +45,8 @@ def reset_snake ():
 	# sets the defalt vaules of the eviroment and snake 
 	pygame.time.wait(300)
 	global grid  
-	global apples
 	global snake       
 	grid={} #empty to be set later 
-	#apples=[]
-	apples=["0,0","3,2","5,3","2,4","3,4"] 
 	snake={"2,3":1,"2,4":1,"2,5":1}
 	#  pair of numbers are coordiates, the number represents the direction of 
 	# the snake segments  
@@ -55,11 +56,13 @@ def reset_grid (grid):
 	for I in range(int((screen.width/50*(screen.height/50)))) :
 		item={f"{I%10},{int(I/10)}":""} 
 		grid.update(item)
-	#product of snake/grid indision   
-    global apples
+	#product of snake/grid indision
+
+def reset_apple ():
+	global apples
 	apples=[]
 	for i in range(max_apples):
-		apples.append(f"{random.randrange(0,int(screen.width/50))},{random.randrange(0,int(screen.heoght/50))}")
+		apples.append(f"{random.randrange(0,int(screen.width/50))},{random.randrange(0,int(screen.height/50))}")
    
 	print(f"max apples {max_apples}")
 
@@ -87,10 +90,10 @@ def pos_get(stre):
 		else: 
 			x_y[0]=int(L)
 			x_y[1]=int(stre[len(str(x_y[0]))+1:len(stre)])
-			#print (x_y) 
+			#print (x_y)  
 			return x_y
 
-# logic functions 
+# logic functions
 
 def fonts_li (str="df"):    
         #print("loading font fuction") 
@@ -143,7 +146,7 @@ def per2pix (percent,whole="s_w"):
 	return int( (percent / 100) * m_whole)
 
 reset_grid(grid)# makes the grid 
-
+reset_apple()
 #       --------- game loop 
 
 while running:
@@ -153,20 +156,22 @@ while running:
 		if event.type==pygame.QUIT: 
 			running=False   
    
-	if "home_screen" in flags: 
-		bg_color="lime green" 
+	if "home_screen" in flags:
+		bg_color="lime green"
 		try:
-			sc_chearker = pygame.transform.scale(cheacker_bg, (screen.width()+ per2pix(10),screen.width()+ per2pix(10)))
-			chearker_bg_rect=cheacker_bg.get_rect()  
-			cheacker_bg.trandsform.rotate(cheacker_bg.)
+
+			sc_chearker = pygame.transform.scale(cheacker_bg, (screen.width()+ per2pix(1),screen.width()+ per2pix(1)))
+			
+			chearker_bg_rect=cheacker_bg.get_rect()
 			screen.blit(sc_chearker,chearker_bg_rect,screen.get_rect())
-		except: 
+		except:
 			pass
 		draw_text("snake.py",per2pix(20),per2pix(20,"s_h"),(128,230,185),"t1") 
-		if button(per2pix(30),per2pix(65,"s _h"),per2pix(30),per2pix(10,"s_h"),"Play!", (20,180,200),(180,250,230)) :
+		if button(per2pix(30),per2pix(65,"s_h"),per2pix(30),per2pix(10,"s_h"),"Play!", (20,180,200),(180,250,230)) :
 			print("button pressed ")
 			flags=[] 
 			flags.append("snake")
+			reset_apple()
 		if button(per2pix(30),per2pix(75,"s_h"),per2pix(30),per2pix(10,"s_h"),"settings",(20,180,200), (180,250,230)):
 			flags=[] 
 			flags.append("settings")
@@ -174,7 +179,7 @@ while running:
 			running=False
 
 	elif "settings" in flags:  
-		bg_color="red"
+		bg_color="khaki"
 		draw_text("settings",per2pix(30),per2pix(8,"s_h"))
         # exit button 
 		if button(per2pix(1),per2pix(1,"s_h"),per2pix(3),per2pix(3,"s_h"),"<", (250,100,160),(100,100,100)):
@@ -190,13 +195,12 @@ while running:
 
 		#modes:
 		#- fliping snake - dashed snake  -   	
-
-        if button( per2pix(30),per2pix(60,"s_h"),per2pix(5),per2pix(5,"s_h"),f" snake color: { snake_color }"):
-		    snake_color="purple"
-        if button(per2pix(30),per2pix(75,"s_h"),per2pix(5),per2pix(5,"s_h"),f" grid color: {game_color}"):
-            game_color="green"
+		if button( per2pix(30),per2pix(60,"s_h"),per2pix(5),per2pix(5,"s_h"),f" snake color: { snake_color }"):
+			snake_color="purple"
+		if button(per2pix(30),per2pix(75,"s_h"),per2pix(5),per2pix(5,"s_h"),f" grid color: {game_color}"):
+			game_color="green"
 		#snake color
-		#- needs shading 
+		#- needs shading
 
 		# game size
 		draw_text(f"Game Size : {game_size}",per2pix(35),per2pix(30))
@@ -204,41 +208,48 @@ while running:
 			game_size-=1
 		if button(per2pix(70),per2pix(30,"s_h"),per2pix(5),per2pix(5,"s_h"), ">", (200,150,200 ),(255,180,180 ) ):
 			game_size+=1
-
 		if button(per2pix(30),per2pix(45,"s_h"),per2pix(5),per2pix(5),f"gamemode: {game_mode}"):
-            if gam_modes(game_mode)= gam_modes.len:
-	            game_mode = gam_modes[-1]
-        else: 
-		    game_mode= gam_modes[game_mode +1 ]
+			if gam_modes.index(game_mode)== len(gam_modes):
+				game_mode = gam_modes[-1]
+			else:
+				game_mode= gam_modes[gam_modes.index(game_mode)+1]
 
-
-	elif "game_over" in flags: 
-		bg_color="orange" 
-        score=0
-
+		# game speed 
+		draw_text(f"game speed: {speed}", per2pix(35),per2pix(95,"s_h"))
+		if button(per2pix(30),per2pix( 95 ,"s_h"),per2pix(5),per2pix(5,"s_h"),"<"):
+			if not speed-0.1 < 0.1 :
+				speed+=-0.1
+		if button(per2pix(70),per2pix( 95 ,"s_h"),per2pix(5),per2pix(5,"s_h"),">"):
+			speed+=0.1
 	
+	
+	elif "game_over" in flags:
+		bg_color="orange"
 		draw_text("Game Over", per2pix(15), per2pix(10,"s_h"),(130,233,199),"t2")
+		draw_text(f"score: {score}",per2pix(5),per2pix(20,"s_h"))
 
 		if button(per2pix(30),per2pix(40,"s_h"),per2pix(25),per2pix(10,"s_h"),"replay?",(34,234,122),(122,34,200)):
 			print("retry")
-			flags=[] 
+			score=0
+			flags=[]
 			flags.append("snake") 
+			reset_apple()
 			reset_snake()
      
 		if button(per2pix(30),per2pix(20,"s_h"),per2pix(25),per2pix(10,"s_h"),"settings",(205,123,145),(100,244,253)):
 			print("settings") 
-			flags=[] 
+			flags=[]
 			flags.append("settings")
 
 
 		if button(per2pix(30),per2pix(80,"s_h"), per2pix(25), per2pix(10, "s_h"), "Quit", (21,123,104),(229,200,135)):
 			print("quit")
 			flags=[]
-			running =False  
-
-
+			running =False
+	
+	
 	elif "snake" in flags :
-		bg_color="teal"  
+		bg_color="teal"
  
 		if "begin" in flags:  
 			keys=pygame.key.get_pressed() # 	arrow key input 
@@ -299,7 +310,9 @@ while running:
 			
    
 			# add arrow check
-		if "begin" in flags:    
+		if "begin" in flags and time.perf_counter() > m_time:
+			print(f"c_time: {time.perf_counter()} , speed: {speed}")
+			m_time=time.perf_counter()+speed
 			#    ---- uses python frount segmnet to move or extend snake 
 			if snake[f"{x_y[0]},{x_y[1]}"]==1: 
 				#  checks if the snake colides with apple and walls  
@@ -356,20 +369,20 @@ while running:
 						add_apple(snake,apples)
 				else:  
 					flags.append("game_over") 
-
+		if "begin" in flags:
 			# renders the apples 
-			for x in apples:
+			for x in apples: 
 				x_y=pos_get(x)
 				player_square.x=x_y[0]*50
-				player_square.y=x_y[1]*50 
+				player_square.y=x_y[1]*50
 				try:  # image 
 					sc_apple = pygame.transform.scale(apple, (50,50))
 					screen.blit(sc_apple,player_square)
 				except:  
 					pygame.draw.rect(screen,(240,110,170),player_square)
 
-	pygame.display.flip()  
 
+	pygame.display.flip()
 	reset_grid(grid)
 	clock.tick(framerate)
 pygame.quit()
